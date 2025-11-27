@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # PFCP-GO
 
 PFCP (Packet Forwarding Control Protocol) implementation in Go based on 3GPP TS 29.244 (not fully compliant/more influenced rather than a strict implementation that follows the spec).
@@ -253,7 +252,3 @@ pfcp-go/
 ├── test/docker/          # Docker Compose test environment
 └── docs/                 # 3GPP specifications and notes
 ```
-=======
-# pfcp-go
-Packet Filter Configuration Protocol - Go implementation for client/server side
->>>>>>> 98f14f9d488f772bba68913ab90cc9d2c64974fc

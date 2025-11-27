@@ -30,9 +30,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
-<<<<<<< HEAD
 
 # Documentation and references (not committed to git)
 /docs/
-=======
->>>>>>> 98f14f9d488f772bba68913ab90cc9d2c64974fc
