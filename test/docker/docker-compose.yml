@@ -1,0 +1,38 @@
+services:
+  pfcp-cp:
+    build:
+      context: ../..
+      dockerfile: test/docker/Dockerfile.cp
+    container_name: pfcp-cp
+    command:
+      - -node-id=cp-node-1
+      - -listen-addr=0.0.0.0:8805
+      - -grpc-addr=0.0.0.0:50051
+      - -heartbeat-interval=60s
+    ports:
+      - "8805:8805/udp"
+      - "50052:50051/tcp"
+
+  pfcp-up-vpp:
+    build:
+      context: ../..
+      dockerfile: test/docker/Dockerfile.vpp
+    container_name: pfcp-up-vpp
+    privileged: true
+    environment:
+      - PFCP_CP_ADDRESS=pfcp-cp:8805
+      - PFCP_UP_NODE_ID=up-node-1
+      - PFCP_UP_LOCAL_ADDR=0.0.0.0:8805
+    volumes:
+      - /sys/bus/pci/drivers:/sys/bus/pci/drivers
+      - /sys/kernel/mm/hugepages:/sys/kernel/mm/hugepages
+      - /sys/devices/system/node:/sys/devices/system/node
+      - /dev:/dev
+    cap_add:
+      - SYS_ADMIN
+      - SYS_NICE
+      - SYS_RESOURCE
+      - NET_ADMIN
+      - IPC_LOCK
+    depends_on:
+      - pfcp-cp

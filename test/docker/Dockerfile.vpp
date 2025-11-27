@@ -1,0 +1,53 @@
+FROM golang:1.24 AS builder
+
+WORKDIR /build
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 go build -o /build/pfcp-up ./cmd/pfcp-up
+
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+    ca-certificates \
+    iproute2 \
+    pciutils \
+    numactl \
+    libnuma1 \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -s https://packagecloud.io/install/repositories/fdio/release/script.deb.sh | bash && \
+    apt-get update && \
+    apt-get install -y \
+    vpp \
+    vpp-plugin-core \
+    vpp-plugin-dpdk \
+    libvppinfra \
+    vpp-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /var/log/vpp /run/vpp /etc/vpp && \
+    chown -R vpp:vpp /var/log/vpp /run/vpp 2>/dev/null || true
+
+COPY --from=builder /build/pfcp-up /usr/local/bin/pfcp-up
+COPY test/docker/vpp-startup.conf /etc/vpp/startup.conf
+COPY test/docker/docker-entrypoint-vpp.sh /docker-entrypoint.sh
+
+RUN chmod +x /docker-entrypoint.sh
+
+ENV VPP_STARTUP_CONF=/etc/vpp/startup.conf
+
+EXPOSE 8805/udp
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

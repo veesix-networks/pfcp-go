@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package pfcp.v1;
+
+option go_package = "github.com/veesix-networks/pfcp-go/api/pfcp/v1;pfcpv1";
+
+service ControlPlane {
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+  rpc ModifySession(ModifySessionRequest) returns (ModifySessionResponse);
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
+  rpc ListAssociations(ListAssociationsRequest) returns (ListAssociationsResponse);
+}
+
+message CreateSessionRequest {
+  string node_id = 1;
+  repeated PDR pdrs = 2;
+  repeated FAR fars = 3;
+  repeated QER qers = 4;
+  repeated URR urrs = 5;
+}
+
+message CreateSessionResponse {
+  uint64 seid = 1;
+}
+
+message ModifySessionRequest {
+  uint64 seid = 1;
+  repeated PDR pdrs = 2;
+  repeated FAR fars = 3;
+  repeated QER qers = 4;
+  repeated URR urrs = 5;
+}
+
+message ModifySessionResponse {
+  bool success = 1;
+}
+
+message DeleteSessionRequest {
+  uint64 seid = 1;
+}
+
+message DeleteSessionResponse {
+  bool success = 1;
+}
+
+message ListAssociationsRequest {}
+
+message ListAssociationsResponse {
+  repeated Association associations = 1;
+}
+
+message Association {
+  string node_id = 1;
+  string remote_addr = 2;
+  int64 established_at = 3;
+}
+
+message PDR {
+  uint32 id = 1;
+  uint32 precedence = 2;
+  PacketDetectionInfo pdi = 3;
+  uint32 far_id = 4;
+}
+
+message PacketDetectionInfo {
+  uint32 source_interface = 1;
+  string sdf_filter = 2;
+  string ue_ip_address = 3;
+  string network_instance = 4;
+  string application_id = 5;
+}
+
+message FAR {
+  uint32 id = 1;
+  uint32 apply_action = 2;
+  ForwardingParameters forwarding_params = 3;
+}
+
+message ForwardingParameters {
+  uint32 destination_interface = 1;
+  string network_instance = 2;
+}
+
+message QER {
+  uint32 id = 1;
+  uint32 gate_status = 2;
+  uint64 mbr_uplink = 3;
+  uint64 mbr_downlink = 4;
+}
+
+message URR {
+  uint32 id = 1;
+  uint32 measurement_method = 2;
+}
